@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import static com.example.gaurav.puzzle.PuzzleBoard.NUM_TILES;
+
 public class Main2Activity extends AppCompatActivity {
 
     private View view;
@@ -24,6 +26,7 @@ public class Main2Activity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(Main2Activity.this,PuzzleActivity.class);
                 intent.putExtra("key",1);
+                NUM_TILES=2;
                 startActivity(intent);
 
                 }
@@ -36,6 +39,7 @@ public class Main2Activity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(Main2Activity.this,PuzzleActivity.class);
                 intent.putExtra("key",2);
+                NUM_TILES=3;
                 startActivity(intent);
 
             }
@@ -46,6 +50,7 @@ public class Main2Activity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(Main2Activity.this,PuzzleActivity.class);
                 intent.putExtra("key",3);
+                NUM_TILES=4;
                 startActivity(intent);
 
             }

@@ -73,7 +73,7 @@ public class PuzzleBoardView extends View {
     public void shuffle() {
         if (animation == null && puzzleBoard != null) {
 
-            for(int i =0; i<20; i++){
+            for(int i =0; i<10; i++){
                 ArrayList<PuzzleBoard> neighbours = puzzleBoard.neighbours();  //get neighbours
 
                 int randomInt = random.nextInt(neighbours.size());
@@ -142,8 +142,8 @@ public class PuzzleBoardView extends View {
             }
         }
         Button photobutton=(Button)findViewById(R.id.photo_button);
-        Button shufflebutton=(Button)findViewById(R.id.shuffle_button);
-       // shufflebutton.setEnabled(false);
+        Button shufflebutton=(Button)findViewById(R.id.solve_button);
+//       shufflebutton.setEnabled(false);
 
         //code something
     }

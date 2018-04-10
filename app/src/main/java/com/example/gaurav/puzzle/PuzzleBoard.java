@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class PuzzleBoard {
 
-    private static final int NUM_TILES = 3;
+    public static int NUM_TILES ;
     private static final int[][] NEIGHBOUR_COORDS = {
             { -1, 0 },
             { 1, 0 },
@@ -166,14 +166,14 @@ public class PuzzleBoard {
     public int priority() {
         int dist = 0;
         PuzzleTile tile;
-        for(int i = 0; i < 9; i++){
+        for(int i = 0; i < NUM_TILES*NUM_TILES; i++){
             tile = tiles.get(i);
             if(tile != null){
                 int pos = tile.getNumber();
-                int x = (pos % 3) - 1;
-                int y = pos / 3;
-                int currentX = (i % 3) - 1;
-                int currentY = i / 3;
+                int x = (pos % NUM_TILES) - 1;
+                int y = pos / NUM_TILES;
+                int currentX = (i % NUM_TILES) - 1;
+                int currentY = i / NUM_TILES;
                 dist = dist + (Math.abs(currentX - x)) + Math.abs(currentY - y);
             }
         }

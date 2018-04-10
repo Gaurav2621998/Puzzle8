@@ -1,5 +1,6 @@
 package com.example.gaurav.puzzle;
 
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -25,6 +26,7 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -39,8 +41,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 import static android.app.Activity.RESULT_OK;
+import static com.example.gaurav.puzzle.PuzzleBoard.NUM_TILES;
 import static com.example.gaurav.puzzle.R.drawable.img2;
 import static com.example.gaurav.puzzle.R.id.image;
 
@@ -58,11 +63,18 @@ public class PuzzleActivity extends AppCompatActivity {
     Bundle bd;
     int count;
     CountDownTimer waittimer;
-
+    TextView t;
+    Boolean Galary=true;
+    String value;
     private ImageView ivPhoto;
     RelativeLayout container;
     File f;
+    CharSequence[] options=null;
     public int end = 0;
+
+    SharedPreferences sp;
+
+    private PreferenceChangeListener preferenceChangeListener=null;
 
 
     @Override
@@ -71,9 +83,24 @@ public class PuzzleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_puzzle);
         bd=getIntent().getExtras();
         bd.getString("key");
+
+            if (bd.getInt("key") == 1) {
+                value="Easy";
+            } else if (bd.getInt("key") == 2) {
+                value="Medium";
+            } else if (bd.getInt("key") == 3) {
+                value="Hard";
+            }
+        t=(TextView)findViewById(R.id.hello11);
         tv=(TextView)findViewById(R.id.timer);
         count=0;
 
+
+
+        sp=PreferenceManager.getDefaultSharedPreferences(this);
+        preferenceChangeListener=new PreferenceChangeListener();
+        sp.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+        ApplySettings();
 
         container = (RelativeLayout) findViewById(R.id.puzzle_container);
         boardView = new PuzzleBoardView(PuzzleActivity.this);
@@ -84,7 +111,7 @@ public class PuzzleActivity extends AppCompatActivity {
         shufflebutton=(Button)findViewById(R.id.shuffle_button);
          solvebutton=(Button)findViewById(R.id.solve_button);
 
-        PreferenceManager.setDefaultValues(this,R.xml.settings_screen,false);
+        //PreferenceManager.setDefaultValues(this,R.xml.settings_screen,false);
 
        shufflebutton.setEnabled(false);
         solvebutton.setEnabled(false);
@@ -93,6 +120,52 @@ public class PuzzleActivity extends AppCompatActivity {
         m.setLooping(true);
 
     }
+
+    private class PreferenceChangeListener implements
+            SharedPreferences.OnSharedPreferenceChangeListener {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences prefs,
+                                              String key) {
+            ApplySettings();
+        }
+    }
+
+    public void ApplySettings() {
+//        // edittext
+//        String name = sp.getString("username", "null");
+//        tv.setText(name);
+        Boolean switchh =sp.getBoolean("switch",false);
+        if(switchh){
+            Galary=true;
+        }
+        else{
+            Galary=false;
+        }
+
+        // checkbox
+//        Boolean fullscreen = sp.getBoolean("fullscreen", false);
+//        if (fullscreen) {
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//
+//        } else {
+//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        }
+
+        // listpreferences
+        String coloract = sp.getString("List", value);
+        View view = this.getWindow().getDecorView();
+
+        if (coloract.equals("Easy")) {
+            NUM_TILES=2;
+
+        } else if (coloract.equals("Medium")) {
+            NUM_TILES=3;
+        } else if (coloract.equals("Hard")) {
+            NUM_TILES=4;
+        }
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,8 +194,12 @@ public class PuzzleActivity extends AppCompatActivity {
 
     public void dispatchTakePictureIntent(final View view) {
 
-        final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
-
+        if(Galary) {
+             options = new CharSequence[]{"Take Photo", "Choose from Gallery", "Cancel"};
+        }
+        else{
+             options = new CharSequence[]{"Take Photo", "Cancel"};
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(PuzzleActivity.this);
          shufflebutton=(Button)findViewById(R.id.shuffle_button);
          solvebutton=(Button)findViewById(R.id.solve_button);
@@ -210,8 +287,7 @@ public class PuzzleActivity extends AppCompatActivity {
             BitmapFactory.Options options = new BitmapFactory.Options();
 
             final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(), options);
-            //Bitmap bit=(Bitmap)extra.get("data");
-           // boardView.initialize(bitmap, container);
+            boardView.initialize(bitmap, container);
             ImageView imageView = (ImageView) findViewById(R.id.image);
             imageView.setImageBitmap(bitmap);
               //  MyCount counter = new MyCount(5000,1000);
@@ -253,56 +329,58 @@ public class PuzzleActivity extends AppCompatActivity {
     public void shuffleImage(View view) {
         count++;
         boardView.shuffle();
-        if(count==1)
-        {
-            final CountDownTimer waittimer;
-            long mill = 180000;
-            long countdown = 1000;
-            if (bd.getInt("key") == 1) {
-                mill = 300000;
-            } else if (bd.getInt("key") == 2) {
-                mill = 180000;
-            } else if (bd.getInt("key") == 3) {
-                mill = 60000;
-            }
-
-            waittimer = new CountDownTimer(mill, countdown) {
-
-                public void onTick(long millisUntilFinished) {
-                    if(end==0) {
-                        tv.setText("" + millisUntilFinished / 1000);
-
-                    }
-                    else {
-                        this.cancel();
-
-
-
-                    }
-
-
-                    //here you can have your logic to set text to edittext
-                }
-//tv.setText("" + millisUntilFinished / 1000);
-                public void onFinish() {
-
-                    tv.setText("Time Over!");
-                    shufflebutton.setEnabled(false);
-                    solvebutton.setEnabled(false);
-                    Toast toast = Toast.makeText(PuzzleActivity.this, "You lose", Toast.LENGTH_LONG);
-                    toast.show();
-
-                }
-
-            }.start();
-
-        }
+//        if(count==1)
+//        {
+//            final CountDownTimer waittimer;
+//            long mill = 180000;
+//            long countdown = 1000;
+//
+//            if (bd.getInt("key") == 1) {
+//                mill = 300000;
+//            } else if (bd.getInt("key") == 2) {
+//                mill = 180000;
+//            } else if (bd.getInt("key") == 3) {
+//                mill = 60000;
+//            }
+//
+//            waittimer = new CountDownTimer(mill, countdown) {
+//
+//                public void onTick(long millisUntilFinished) {
+//                    if(end==0) {
+//                        tv.setText("" + millisUntilFinished / 1000);
+//
+//                    }
+//                    else {
+//                        this.cancel();
+//
+//
+//
+//                    }
+//
+//
+//                    //here you can have your logic to set text to edittext
+//                }
+////tv.setText("" + millisUntilFinished / 1000);
+//                public void onFinish() {
+//
+//                    tv.setText("Time Over!");
+//                    shufflebutton.setEnabled(false);
+//                    solvebutton.setEnabled(false);
+//                    Toast toast = Toast.makeText(PuzzleActivity.this, "You lose", Toast.LENGTH_LONG);
+//                    toast.show();
+//
+//                }
+//
+//            }.start();
+//
+//        }
 
     }
 
     public void solve(View view) {
         boardView.solve();
         shufflebutton.setEnabled(false);
+        solvebutton.setEnabled(false);
         Toast toast=Toast.makeText(PuzzleActivity.this,"Try with different image",Toast.LENGTH_LONG);
         toast.show();
         tv.setText("Over");
